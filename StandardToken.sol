@@ -27,14 +27,14 @@ contract StandardToken is ERC20, ERC223 {
 	function name()
         public
         view
-        returns (string) {
+        returns (string memory) {
         return _name;
     }
 
     function symbol()
         public
         view
-        returns (string) {
+        returns (string memory) {
         return _symbol;
     }
 
@@ -58,12 +58,12 @@ contract StandardToken is ERC20, ERC223 {
     	balances[msg.sender] = SafeMath.sub(balances[msg.sender], _value);
     	balances[_to] = SafeMath.add(balances[_to], _value);
 
-    	Transfer(msg.sender, _to, _value);
+    	emit Transfer(msg.sender, _to, _value);
     	return true;
 
     }
 
-    function balanceOf(address _address) public returns (uint256) {
+    function balanceOf(address _address) public view returns (uint256) {
     	return balances[_address];
     }
 
@@ -76,24 +76,24 @@ contract StandardToken is ERC20, ERC223 {
      	balances[_to] = SafeMath.add(balances[_to], _value);
      	allowed[_from][msg.sender] = SafeMath.sub(allowed[_from][msg.sender], _value);
 
-     	Transfer(_from, _to, _value);
+     	emit Transfer(_from, _to, _value);
      	return true;
     }
 
 
     function approve(address _spender, uint256 _value) public returns (bool) {
     	allowed[msg.sender][_spender] = _value;
-    	Approval(msg.sender, _spender, _value);
+    	emit Approval(msg.sender, _spender, _value);
     	return true;
     }
 
-    function allowance(address _owner, address _spender) public returns (uint256) {
+    function allowance(address _owner, address _spender) public view returns (uint256) {
     	return allowed[_owner][_spender];
     }
 
     function increaseApproval(address _spender, uint _addedValue) public returns (bool) {
     	allowed[msg.sender][_spender] = SafeMath.add(allowed[msg.sender][_spender], _addedValue);
-    	Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
+    	emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     	return true;
     }
 
@@ -105,11 +105,11 @@ contract StandardToken is ERC20, ERC223 {
     		allowed[msg.sender][_spender] = SafeMath.sub(oldValue, _subtractedValue);
     	}
 
-    	Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
+    	emit Approval(msg.sender, _spender, allowed[msg.sender][_spender]);
     	return true;
     }
 
-    function transfer(address _to, uint _value, bytes _data) public {
+    function transfer(address _to, uint _value, bytes memory _data) public {
     	require(_value > 0);
     	if(isContract(_to)) {
     		ERC223ReceivingContract receiver = ERC223ReceivingContract(_to);
@@ -117,16 +117,17 @@ contract StandardToken is ERC20, ERC223 {
     	}
     	balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
-        Transfer(msg.sender, _to, _value, _data);
+        emit Transfer(msg.sender, _to, _value, _data);
     }
 
     function isContract(address _address) private returns (bool) {
+    	
     	uint length;
-    	assemply {
-    		//retrieve the size of the code on target address, this needs assembly
-            length := extcodesize(_address)
-    	}
-    	return (length > 0);
+        assembly {
+                //retrieve the size of the code on target address, this needs assembly
+                length := extcodesize(_address)
+          }
+          return (length>0);
     } 
 }
 
