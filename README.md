@@ -1,7 +1,8 @@
-# erc223-token-contract
+# ERC223-token-contract
 
 ### Minimal viable implementation of the token, ready for use.
 
+Token Standard : https://raw.githubusercontent.com/Dexaran/ERC223-token-standard
 https://github.com/Dexaran/ERC223Token
 
 ## ERC223 token standard.
